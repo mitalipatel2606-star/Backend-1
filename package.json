@@ -1,0 +1,20 @@
+{
+  "name": "backend-project",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/mitalipatel2606-star/Backend-1#readme",
+  "bugs": {
+    "url": "https://github.com/mitalipatel2606-star/Backend-1/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitalipatel2606-star/Backend-1.git"
+  },
+  "license": "ISC",
+  "author": "mitali",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
