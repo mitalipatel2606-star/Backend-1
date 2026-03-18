@@ -1,4 +1,42 @@
-import mongoose from "mongoose";
+import dotenv from "dotenv";
+import connectDB from "./db/index.js";
+dotenv.config({
+    path: './.env'
+})
+connectDB();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*import mongoose from "mongoose";
 import { DB_NAME } from "./contacts";
 import express from "express";
 const app = express();
@@ -20,3 +58,4 @@ const app = express();
         }
     }
 )()
+    */
