@@ -14,6 +14,16 @@ app.use(express.urlencoded({
     limit: "16kb"
 }))
 app.use(express.static("public"))
-app.use(cookieParser);
+app.use(cookieParser());
 
-export default app
+
+//routes import
+import userRouter from './routes/user.routes.js'
+
+//instead of declaring the routes here, we are going to import them and use them as 
+//middleware so, we pass the route and the middleware that we imported from "user.routes.js"
+app.use("/api/v1/users", userRouter)
+//here route is provided in teh userRouter and "...users " is just a prefix 
+// http://localhost:8000/users/register
+
+export { app }
