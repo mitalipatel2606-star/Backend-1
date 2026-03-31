@@ -1,7 +1,22 @@
 import { Router } from "express"
 import { registerUser } from "../controller/user.controller.js";
-const router = Router();
+import { upload } from "../middleware/multer.middleware.js";
 
-router.route("/register").post(registerUser)
+
+const router = Router();
+//add a middleware in the post method itself
+router.route("/register").post(
+    upload.fields([
+        {
+            name: "avatar",
+            maxCount: 1
+        },
+        {
+            name: "coverImage",
+            maxCount: 1
+        }
+    ]),
+    registerUser)
+
 
 export default router
