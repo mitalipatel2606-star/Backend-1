@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-import jwt, { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-import { JsonWebTokenError } from "jsonwebtoken";
+// import { JsonWebTokenError } from "jsonwebtoken";
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         trim: true
     },
-    fullname: {
+    fullName: {
         type: String,
         required: true,
         index: true,
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
 
         trim: true
     },
-    avtar: {
+    avatar: {
         type: String,
         required: true //cloudinary url
     },
@@ -55,11 +55,9 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 })
 
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 10);
-    next()
-
 })
 // this is how a user defined function is written for/in/using mongoose
 userSchema.methods.isPasswordCorrect = async function (password) {
@@ -73,7 +71,7 @@ userSchema.methods.generateAccessToken = function () {
             _id: this._id,
             email: this.email,
             username: this.username,
-            fullname: this.fullname
+            fullName: this.fullName
         },
         process.env.ACCESS_TOKEN_SECRET,
         {

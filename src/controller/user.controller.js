@@ -5,14 +5,15 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-    res.status(200).json({
-        message: "message ok"
-    })
+    // res.status(200).json({
+    //     message: "message ok"
+    // })
     const { fullName, email, username, password } = req.body
-    console.log("email: ,", email)
+    console.log(req.body)
+    console.log("email: ", email)
     //Check for empty fields first
     // if (fullName === "") {
-    //     throw new ApiError(400, "fullname is required")//
+    //     throw new ApiError(400, "fullName is required")//
 
     // }
     if (
@@ -25,15 +26,21 @@ const registerUser = asyncHandler(async (req, res) => {
     //now check is the user already exists
     //findOne method:finds the first user with the given username/parameter
     //$:operator to check values
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
     if (existedUser) {
         throw new ApiError(409, "User with email or username already exists")
     }
     //extract the avatar image to our local 
-    const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.
+        coverImage) && req - files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].
+            path
+    }
+    // const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
     if (!avatarLocalPath) throw new ApiError(400, "Uploading avatar is mandatory")
     const avatar = await uploadOnCloudinary(avatarLocalPath)
@@ -54,7 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) throw new ApiError(500, "Somewthing went wrong while registering the user")
 
     return res.status(201).json(
-        new ApiResponse(200, createdUser, "User registered successfully")
+        new ApiResponse(201, createdUser, "User registered successfully")
     )
 })
 
