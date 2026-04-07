@@ -47,7 +47,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is required']
     },
+    //two things: refresh token and access token 
+    //access token checks the authentication: user and db should have the same
+    //refreshToken stays viable for a time limit after , it should be again, same for the user 
+    //and the db
+    //if it isnt the same (becuase the time limit has expired, then a new one has to be generated)
     refreshToken: {
+
         type: String
     }
 
@@ -59,7 +65,7 @@ userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 10);
 })
-// this is how a user defined function is written for/in/using mongoose
+// this is how a user defined function is written for/in/using mongoose object
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
     //here password is the original what user entered and this.password is the encrypted one 
