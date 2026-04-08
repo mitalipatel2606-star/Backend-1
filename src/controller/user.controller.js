@@ -134,10 +134,35 @@ const loginUser = asyncHandler(async (req, res) => {
 //send cookie //return in the end
 
 const logoutUser = asyncHandler(async (req, res) => {
-
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        }, {
+        new: true
+    }
+    )
+    //options are cookie configuration settings
+    //cookie must be cleared with the same options it was set with
+    const options = {
+        httpOnly: true,//js cannot read the cookie, prevents from xss attacks
+        secure: true//only sent on the https, prevents man in the middle attack
+    }
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(
+            new ApiResponse(200, {}, " User logged out successfully")
+        )
 })
+//$set method used to specify in mongoose which fields need to be modified
+// to logout just delete the refresh token of the user which you can query 
+//from the database using the id which was added fromt he suer from user.id
 
 
 
 
-export { registerUser, loginUser }
+export { registerUser, loginUser, logoutUser }
