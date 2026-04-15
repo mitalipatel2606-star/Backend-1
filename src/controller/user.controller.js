@@ -236,7 +236,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     if (!fullName || !email) {
         throw new ApiError(400, "All fields are required")
     }
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
@@ -260,6 +260,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
             "Avatar file is missing"
         )
     }
+    //delete old image
+    const deleteOldAvatar = FileSystem.unlinkSync(avatar)
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     const user = await User.findByIdAndUpdate(
@@ -297,6 +299,48 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, user, "COver Image updated successfully"))
+})
+
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params
+    if (!username?.trim()) {
+        throw new ApiError(400, "Username is missing")
+
+    }
+    const channel = await User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                foreignField: "channel",
+                localField: "_id",
+                as: "subscribers"
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                foreignField: "subscriber",
+                localField: "_id",
+                as: "subscribedTo "
+            }
+        },
+        {
+            $addFields: {
+                subscriberCount: {
+                    $size: "$subscribers"
+                },
+                channelSubscribedTo: {
+                    $size: "subscribedTo"
+                }
+            }
+        }
+    ])
+
 })
 
 
