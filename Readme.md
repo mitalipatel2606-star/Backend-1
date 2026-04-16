@@ -248,17 +248,33 @@ The server starts at `http://localhost:8000`
 
 ---
 
-## 🛣️ Roadmap
+## 📝 What I've Learned
 
-- [ ] Refresh token rotation endpoint
+Through building this backend, I have developed a solid understanding of:
+- **Advanced Mongoose:** Schema design, pre-save hooks, instance methods, and complex aggregation pipelines (including `$lookup`, `$match`, `$addFields`, and nested pipelines).
+- **Authentication Flows:** Designing a robust dual-token JWT system (access and refresh tokens) with secure `httpOnly` cookie management.
+- **File Upload Pipelines:** Managing multi-part form data with `multer` for local temp storage and integrating with `Cloudinary` for cloud hosting.
+- **Express.js Architecture:** Building a scalable, MVC-like structure separating routers, controllers, models, and utility classes.
+- **Error Handling:** Standardizing responses via custom `ApiError` and `ApiResponse` utilities paired with an async wrapper for clean async/await logic.
+
+---
+
+## 🛣️ Roadmap & Next Steps
+
+**Technical Enhancements (Upcoming):**
+- [ ] Implement robust **Input Validation** (e.g., Zod) replacing manual string checks.
+- [ ] Add a comprehensive **Testing Suite** (Jest + Supertest).
+- [ ] Centralize application-level Error Handling Middleware.
+- [ ] Add rate limiting and security headers (Helmet) to secure endpoints.
+
+**Feature Roadmap:**
+- [x] User Registration & Cloudinary Avatars
+- [x] JWT Dual-Token Authentication Flow
+- [x] Complex Aggregations (`getUserChannelProfile`, `getWatchHistory`)
 - [ ] Video CRUD operations (upload, update, delete, stream)
-- [ ] User profile update & avatar change
-- [ ] Watch history tracking
 - [ ] Channel subscription system
 - [ ] Video likes, comments & replies
 - [ ] Search with pagination & filtering
-- [ ] Rate limiting & request throttling
-- [ ] Comprehensive test suite (Jest + Supertest)
 - [ ] API documentation with Swagger/OpenAPI
 - [ ] Docker containerization
 
