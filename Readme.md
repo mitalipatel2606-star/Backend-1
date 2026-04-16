@@ -248,9 +248,9 @@ The server starts at `http://localhost:8000`
 
 ---
 
-## 📝 What I've Learned
+## 📝 What I Have Learned
 
-Through building this backend, I have developed a solid understanding of:
+Through building this backend API, I have developed a solid understanding of:
 - **Advanced Mongoose:** Schema design, pre-save hooks, instance methods, and complex aggregation pipelines (including `$lookup`, `$match`, `$addFields`, and nested pipelines).
 - **Authentication Flows:** Designing a robust dual-token JWT system (access and refresh tokens) with secure `httpOnly` cookie management.
 - **File Upload Pipelines:** Managing multi-part form data with `multer` for local temp storage and integrating with `Cloudinary` for cloud hosting.
