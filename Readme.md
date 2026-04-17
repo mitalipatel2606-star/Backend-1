@@ -123,9 +123,17 @@ The server starts at `http://localhost:8000`
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `POST` | `/register` | Register a new user | ❌ |
+| `POST` | `/register` | Register a new user (multipart form) | ❌ |
 | `POST` | `/login` | Authenticate user & issue tokens | ❌ |
-| `POST` | `/logout` | Invalidate session | ✅ |
+| `POST` | `/logout` | Invalidate session & clear cookies | ✅ |
+| `POST` | `/refresh-token` | Refresh expired access token | ❌ |
+| `POST` | `/change-password` | Update current password | ✅ |
+| `GET` | `/current-user` | Get authenticated user's profile | ✅ |
+| `PATCH` | `/update-account` | Update name & email | ✅ |
+| `PATCH` | `/avatar` | Upload new avatar image | ✅ |
+| `PATCH` | `/cover-image` | Upload new cover image | ✅ |
+| `GET` | `/c/:username` | Get channel profile with subscriber count | ✅ |
+| `GET` | `/history` | Get user's watch history | ✅ |
 
 ### Register User — `POST /api/v1/users/register`
 
