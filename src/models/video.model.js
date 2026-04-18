@@ -19,11 +19,11 @@ const videoSchema = new mongoose.Schema({
         required: true
     },
     duration: {
-        Type: Number,
+        type: Number,
         required: true
     },
     views: {
-        Type: Number,
+        type: Number,
         defualt: 0
     },
     published: {

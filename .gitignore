@@ -145,3 +145,4 @@ dist
 
 # Ignore AI analysis artifacts
 project_analysis.md
+src/db/req.txt

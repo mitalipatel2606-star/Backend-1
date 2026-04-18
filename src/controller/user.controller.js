@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
-import { use } from "react";
+
 import mongoose from "mongoose";
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -178,7 +178,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         )
         const user = await User.findById(decodedToken?._id)
         if (!user) {
-            return new ApiError(401, "Invalid refresh token")
+            throw new ApiError(401, "Invalid refresh token")
         }
         if (incomingRefreshToken !== user?.refreshToken) {
             throw new ApiError(401, " Refresh token is expired or used")
@@ -190,8 +190,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)
         return res
             .status(200)
-            .cookie("accessToken", accessToken.options)
-            .cookie("refreshToken", newRefreshTokenefreshToken, options)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
             .json(
                 new ApiResponse(
                     200,
@@ -213,7 +213,7 @@ const changePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body
     const user = await User.findById(req.user?._id)
 
-    const isPasswordCorrect = user.isPasswordCorrect(oldPassword)
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old password")
 
@@ -229,7 +229,7 @@ const changePassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
-        .json(200, req.user, "Current user fetched successfully")
+        .json(new ApiResponse(200, req.user, "Current user fetched successfully"))
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -262,7 +262,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         )
     }
     //delete old image
-    const deleteOldAvatar = FileSystem.unlinkSync(avatar)
+    // const deleteOldAvatar = FileSystem.unlinkSync(avatar)
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     const user = await User.findByIdAndUpdate(
@@ -338,7 +338,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 channelSubscribedTo: {
                     $size: "subscribedTo"
                 },
-                isSubscibed: {
+                isSubscribed: {
                     $cond: {
                         if: { $in: [req.user?._id, "$subscribers.subscriber"] },
                         then: true,
