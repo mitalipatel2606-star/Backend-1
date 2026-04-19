@@ -10,10 +10,10 @@ const generateAccessAndRefreshToken = async (userId) => {
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
-        user.refreshToken = refreshToken
+        const newRefreshToken = user.generateRefreshToken()
+        user.refreshToken = newRefreshToken
         await user.save({ validateBeforeSave: false })
-        return { accessToken, refreshToken }
+        return { accessToken, refreshToken: newRefreshToken }
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating refresh and access tokens")
     }
@@ -105,7 +105,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!isPasswordValid) {
         throw new ApiError(401, "Incorrect credentials ")
     }
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+    const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id)
     const loggedInUser = await User.findById(user._id).
         select("-password -refreshToken")
 
@@ -327,7 +327,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 from: "subscriptions",
                 foreignField: "subscriber",
                 localField: "_id",
-                as: "subscribedTo "
+                as: "subscribedTo"
             }
         },
         {
@@ -336,7 +336,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                     $size: "$subscribers"
                 },
                 channelSubscribedTo: {
-                    $size: "subscribedTo"
+                    $size: "$subscribedTo"
                 },
                 isSubscribed: {
                     $cond: {
@@ -353,7 +353,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 username: 1,
                 subscriberCount: 1,
                 channelSubscribedTo: 1,
-                isSubscibed: 1,
+                isSubscribed: 1,
                 avatar: 1,
                 coverImage: 1,
                 email: 1

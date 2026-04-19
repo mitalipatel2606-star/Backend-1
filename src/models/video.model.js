@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Schema } from mongoose;
+import { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 const videoSchema = new mongoose.Schema({
     videoFile: {
@@ -24,7 +24,7 @@ const videoSchema = new mongoose.Schema({
     },
     views: {
         type: Number,
-        defualt: 0
+        default: 0
     },
     published: {
         type: Boolean,
