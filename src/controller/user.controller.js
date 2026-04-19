@@ -10,10 +10,10 @@ const generateAccessAndRefreshToken = async (userId) => {
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
-        const newRefreshToken = user.generateRefreshToken()
-        user.refreshToken = newRefreshToken
+        const refreshToken = user.generateRefreshToken()
+        user.refreshToken = refreshToken
         await user.save({ validateBeforeSave: false })
-        return { accessToken, refreshToken: newRefreshToken }
+        return { accessToken, refreshToken }
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating refresh and access tokens")
     }
@@ -32,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // }
     if (
         [fullName, email, username, password].some((field) =>
-            field?.trim() === ""
+            typeof field !== "string" || field.trim() === ""
         )) {
 
         throw new ApiError(400, "All fields are required")
@@ -95,6 +95,9 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!username && !email) {// since we are using express.json() middleware we must sent the data as  raw json response
         throw new ApiError(400, "Username or Email is required")
     }
+    if (!password || typeof password !== "string") {
+        throw new ApiError(400, "Password is required")
+    }
     const user = await User.findOne(
         { $or: [{ username }, { email }] }
     )
@@ -105,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!isPasswordValid) {
         throw new ApiError(401, "Incorrect credentials ")
     }
-    const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id)
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
     const loggedInUser = await User.findById(user._id).
         select("-password -refreshToken")
 
@@ -187,15 +190,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             httpOnly: true,
             secure: true
         }
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)
+        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", newRefreshToken, options)
+            .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(
                     200,
-                    { accessToken, refreshToken: newRefreshToken },
+                    { accessToken, refreshToken },
                     "Access token refresh successfully"
                 )
             )
@@ -264,6 +267,9 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     //delete old image
     // const deleteOldAvatar = FileSystem.unlinkSync(avatar)
     const avatar = await uploadOnCloudinary(avatarLocalPath)
+    if (!avatar) {
+        throw new ApiError(400, "Failed to upload avatar")
+    }
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -287,6 +293,9 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         )
     }
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    if (!coverImage) {
+        throw new ApiError(400, "Failed to upload cover image")
+    }
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
