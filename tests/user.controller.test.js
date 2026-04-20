@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 
 import { User } from "../src/models/user.model.js";
 import { loginUser, refreshAccessToken } from "../src/controller/user.controller.js";
+import { validate } from "../src/middleware/validate.middleware.js";
+import { loginUserSchema } from "../src/validation/user.validation.js";
 
 const originalFindOne = User.findOne;
 const originalFindById = User.findById;
@@ -151,4 +153,50 @@ test("refreshAccessToken rotates and returns a new refresh token", async () => {
     } finally {
         jwt.default.verify = originalVerify;
     }
+});
+
+test("validate middleware returns ApiError details for invalid login payloads", async () => {
+    const middleware = validate({ body: loginUserSchema });
+
+    await assert.rejects(
+        new Promise((resolve, reject) => {
+            middleware(
+                {
+                    body: { password: "secret" }
+                },
+                {},
+                (error) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    resolve();
+                }
+            );
+        }),
+        (error) => {
+            assert.equal(error.statusCode, 400);
+            assert.equal(error.message, "Validation failed");
+            assert.deepEqual(error.errors, [
+                {
+                    path: "email",
+                    message: "Username or email is required"
+                }
+            ]);
+            return true;
+        }
+    );
+});
+
+test("loginUserSchema normalizes email and username inputs", () => {
+    const parsed = loginUserSchema.parse({
+        email: "  USER@Example.com ",
+        username: "  Demo_User ",
+        password: "secret"
+    });
+
+    assert.equal(parsed.email, "user@example.com");
+    assert.equal(parsed.username, "demo_user");
+    assert.equal(parsed.password, "secret");
 });
