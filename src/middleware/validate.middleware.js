@@ -15,7 +15,7 @@ const validate = ({ body, params, query } = {}) => (req, res, next) => {
         }
 
         if (params) {
-            req.params = params.parse(req.params);
+            req.param = params.parse(req.params);
         }
 
         if (query) {
